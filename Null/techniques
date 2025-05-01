@@ -101,3 +101,117 @@ echo "Hello all" > /tmp/example1.txt
 
 
 Now after trigger te
+
+
+----------------------------------------------
+
+To create a demo showcasing how to use `auditctl` in Linux, and ensure that system logs are generated and displayed, follow these steps:
+
+---
+
+### **1. Install the Audit Framework**
+Ensure the audit daemon (`auditd`) and the `auditctl` tool are installed on your system.
+
+```bash
+sudo apt-get install auditd audispd-plugins  # For Debian/Ubuntu
+sudo yum install audit audit-libs           # For RHEL/CentOS
+```
+
+---
+
+### **2. Start and Enable the Audit Service**
+Start the `auditd` service and enable it to run at boot.
+
+```bash
+sudo systemctl start auditd
+sudo systemctl enable auditd
+```
+
+---
+
+### **3. Add Audit Rules with auditctl**
+The `auditctl` tool is used to define rules for monitoring system activity. Below are examples of common configurations:
+
+#### **Monitor File Access**
+Monitor read and write access to a specific file (e.g., `/etc/passwd`):
+```bash
+sudo auditctl -w /etc/passwd -p rw -k passwd_monitor
+```
+- **`-w`**: Watch the file.
+- **`-p rw`**: Monitor read (`r`) and write (`w`) permissions.
+- **`-k passwd_monitor`**: Add a key to identify this rule.
+
+#### **Track Command Executions**
+Monitor the execution of commands (e.g., by a specific user):
+```bash
+sudo auditctl -a always,exit -F arch=b64 -S execve -F euid=1000 -k command_monitor
+```
+- **`-a always,exit`**: Always monitor syscalls that exit.
+- **`-F arch=b64`**: Filter for 64-bit architecture.
+- **`-S execve`**: Monitor the `execve` syscall (used for command execution).
+- **`-F euid=1000`**: Filter by the effective user ID (replace `1000` with the target user ID).
+- **`-k command_monitor`**: Add a key to identify this rule.
+
+#### **Monitor Directory Modifications**
+Track changes in a directory (e.g., `/var/log`):
+```bash
+sudo auditctl -w /var/log -p wa -k log_directory
+```
+- **`-p wa`**: Watch for write (`w`) and attribute change (`a`) events.
+
+---
+
+### **4. Generate Activity**
+Perform activities that trigger the audit rules. For example:
+- Edit or view `/etc/passwd` to trigger the file access rule.
+- Run commands as the target user for the command execution rule.
+- Modify files in `/var/log` to test directory monitoring.
+
+---
+
+### **5. View Logs**
+Audit logs are stored in `/var/log/audit/audit.log`. Use `ausearch` or `tail` to inspect them.
+
+#### **Using `ausearch`**
+Search logs by key (`-k`):
+```bash
+sudo ausearch -k passwd_monitor
+```
+
+Search logs for a specific event:
+```bash
+sudo ausearch -sc execve
+```
+
+#### **Using `tail`**
+View live logs:
+```bash
+sudo tail -f /var/log/audit/audit.log
+```
+
+---
+
+### **6. Make Logs System-Wide**
+If you're not seeing logs:
+1. Verify `auditd` is running:
+   ```bash
+   sudo systemctl status auditd
+   ```
+2. Check SELinux/AppArmor (if applicable) for interference:
+   ```bash
+   getenforce  # For SELinux
+   sudo aa-status  # For AppArmor
+   ```
+3. Ensure `/var/log/audit` is writable and has sufficient space.
+
+---
+
+### **7. Stop Monitoring**
+When the demo is done, remove the rules to avoid unnecessary logging:
+```bash
+sudo auditctl -D
+```
+
+---
+
+Would you like a script to automate this process?
