@@ -82,3 +82,22 @@ sudo ausearch -k log_directory
 ---
 
 Would you like additional examples or help with automating these test cases?
+-------------------------------------------------
+
+
+Using Fanotify
+
+nano fanotify_demo.c
+
+To compile: 
+gcc fanotify_demo.c -o fanotify_demo
+
+Verify if it's running or not:
+sudo ./fanotify_demo
+
+Make some events in /tmp
+echo "Hello Bangalore" > /tmp/example1.txt
+echo "Hello all" > /tmp/example1.txt
+
+
+Now after trigger te
