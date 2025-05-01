@@ -1,0 +1,84 @@
+Here are some example commands you can run to trigger the audit rules you set up. Since you are not using a specific user ID in your rules, these commands are general and will work regardless of the user executing them.
+
+---
+
+### **1. Trigger the File Access Rule (`/etc/passwd`)**
+
+#### View the file (read access):
+```bash
+cat /etc/passwd
+```
+
+#### Edit the file (write access):
+```bash
+sudo nano /etc/passwd
+```
+
+#### Append to the file (write access):
+```bash
+echo "# Test entry for auditctl demo" | sudo tee -a /etc/passwd
+```
+
+---
+
+### **2. Trigger the Command Execution Rule (without user ID)**
+
+Monitor command executions by adding this rule:
+```bash
+sudo auditctl -a always,exit -F arch=b64 -S execve -k command_execution
+```
+
+Then run any command to trigger it. For example:
+```bash
+ls
+pwd
+whoami
+```
+
+Alternatively, you can run a shell script to generate multiple events:
+```bash
+echo -e "#!/bin/bash\necho Hello World\nls -l" > test_script.sh
+chmod +x test_script.sh
+./test_script.sh
+```
+
+---
+
+### **3. Trigger the Directory Monitoring Rule (`/var/log`)**
+
+#### Modify a file in the `/var/log` directory:
+```bash
+sudo echo "Test log entry" >> /var/log/test_log.log
+```
+
+#### Create a new file in `/var/log`:
+```bash
+sudo touch /var/log/new_test_file.log
+```
+
+#### Change file attributes in `/var/log`:
+```bash
+sudo chmod 600 /var/log/syslog
+```
+
+---
+
+### **4. View Live Audit Logs**
+To verify your activities are being logged, use:
+
+#### View logs in real-time:
+```bash
+sudo tail -f /var/log/audit/audit.log
+```
+
+#### Search for logs with a specific key:
+If your rules have keys (e.g., `passwd_monitor`, `command_execution`, etc.), use:
+```bash
+sudo ausearch -k passwd_monitor
+sudo ausearch -k command_execution
+sudo ausearch -k log_directory
+```
+
+---
+
+Would you like additional examples or help with automating these test cases?
