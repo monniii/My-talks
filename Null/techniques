@@ -215,3 +215,85 @@ sudo auditctl -D
 ---
 
 Would you like a script to automate this process?
+
+----------------------------------------------------------------------------------------------------------
+
+1. Installing and starting: 
+
+sudo apt-get install auditd audispd-plugins
+
+sudo systemctl start auditd
+sudo systemctl enable auditd
+----------------------------------------------------------------------------------
+2. Add Audit Rules with auditctl
+
+2.1 Monitor File Access --- Monitor read and write access to a specific file (e.g., /etc/passwd):
+	sudo auditctl -w /etc/passwd -p rw -k passwd_monitor
+
+- -w: Watch the file.
+- -p rw: Monitor read (r) and write (w) permissions.
+- -k passwd_monitor: Add a key to identify this rule.
+
+2.2 Track Command Executions --- Monitor the execution of commands
+	sudo auditctl -a always,exit -F arch=b64 -S execve -k command_monitor
+
+- -a always,exit: Always monitor syscalls that exit.
+- -F arch=b64: Filter for 64-bit architecture.
+- -S execve: Monitor the execve syscall (used for command execution).
+- -k command_monitor: Add a key to identify this rule.
+
+2.3 Monitor Directory Modifications --- Track changes in a directory (e.g., /var/log):
+	sudo auditctl -w /var/log -p wa -k log_directory
+
+- -p wa: Watch for write (w) and attribute change (a) events.
+----------------------------------------------------------------------------------
+
+3. Let's make some activity - Perform activities that trigger the audit rules. For example:
+- Edit or view `/etc/passwd` to trigger the file access rule.
+- Run commands for the command execution rule.
+- Modify files in `/var/log` to test directory monitoring.
+
+ 3.1 Trigger the File Access Rule (`/etc/passwd`)
+
+View the file (read access):
+	cat /etc/passwd
+
+
+3.2 Trigger the Command Execution Rule
+Monitor command executions by adding this rule:
+
+	sudo auditctl -a always,exit -F arch=b64 -S execve -k command_execution
+
+Then run any command to trigger it. For example:
+
+ls
+pwd
+whoami
+
+Alternatively, 
+echo -e "#!/bin/bash\necho Hello World\nls -l" > test_script.sh
+chmod +x test_script.sh
+./test_script.sh
+
+3.3 Trigger the Directory Monitoring Rule (`/var/log`)
+Modify a file in the `/var/log` directory:
+
+sudo echo "Test log entry" >> /var/log/test_log.log
+-------------------------------------------------------------------------------------
+
+4. View Live Audit Logs
+To verify your activities are being logged, use:
+
+View logs in real-time:
+
+sudo tail -f /var/log/audit/audit.log
+
+
+Search for logs with a specific key: passwd_monitor, command_execution use:
+
+sudo ausearch -k passwd_monitor
+sudo ausearch -k command_execution
+sudo ausearch -k log_directory
+-------------------------------------------------------------------------------------
+
+
