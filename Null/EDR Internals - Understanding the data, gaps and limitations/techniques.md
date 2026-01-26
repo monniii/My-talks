@@ -1,4 +1,4 @@
-Here are some example commands you can run to trigger the audit rules you set up. Since you are not using a specific user ID in your rules, these commands are general and will work regardless of the user executing them.
+Here are some example commands we can run to trigger the audit rules you set up. Since we are not using a specific user ID in your rules, these commands are general and will work regardless of the user executing them.
 
 ---
 
@@ -35,7 +35,7 @@ pwd
 whoami
 ```
 
-Alternatively, you can run a shell script to generate multiple events:
+Alternatively, we can run a shell script to generate multiple events:
 ```bash
 echo -e "#!/bin/bash\necho Hello World\nls -l" > test_script.sh
 chmod +x test_script.sh
@@ -80,9 +80,6 @@ sudo ausearch -k log_directory
 ```
 
 ---
-
-Would you like additional examples or help with automating these test cases?
--------------------------------------------------
 
 
 Using Fanotify
@@ -192,7 +189,7 @@ sudo tail -f /var/log/audit/audit.log
 ---
 
 ### **6. Make Logs System-Wide**
-If you're not seeing logs:
+If we're not seeing logs:
 1. Verify `auditd` is running:
    ```bash
    sudo systemctl status auditd
