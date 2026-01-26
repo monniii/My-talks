@@ -214,8 +214,6 @@ sudo auditctl -D
 
 ---
 
-Would you like a script to automate this process?
-
 ----------------------------------------------------------------------------------------------------------
 
 1. Installing and starting: 
